@@ -6,7 +6,7 @@ This repository contains useful scripts for automating tasks on the Debian syste
 
 1. Clone the repository to your Debian system.
    ```bash
-   git clone https://github.com/seu-usuario/DebianScripts.git
+   git clone https://github.com/vcavalca/DebianScripts.git
 
 2. Navigate to the repository directory.
    ```bash
