@@ -6,10 +6,7 @@
 # Check if sudo is installed.
 if ! command -v sudo &> /dev/null; then
     echo "The 'sudo' package is not installed. Installing..."
-    su -
-    apt update
-    apt install -y sudo
-    usermod -aG sudo $(whoami)
+    su -c "apt update && apt install -y sudo && usermod -aG sudo $(whoami)"
     echo "Please re-run the script after logging out and logging back in to apply group changes."
     exit 0
 fi
