@@ -10,7 +10,7 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # Update the package list and upgrade existing packages.
-sudo apt update && sudo apt upgrade
+sudo apt update && sudo apt upgrade -y
 
 # Install the gnome-session package.
 sudo apt install -y gnome-session
