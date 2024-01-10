@@ -66,8 +66,7 @@ if ! command -v sudo &> /dev/null; then
     sleep 1
     echo "Please re-run the script after restarting to apply the group changes."
     press_enter_to_continue
-    reboot
-    exit 0
+    exit 1
 fi
 
 # Check if curl is installed.
