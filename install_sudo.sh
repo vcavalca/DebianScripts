@@ -27,38 +27,31 @@ display_message() {
     fi
 }
 
-# Function to install package if not already installed.
-install_package_if_not_installed() {
-    package_name=$1
-    clear_screen
-    echo "The '$package_name' package is not installed. Do you want to install it? (Y/n)"
-    read -r choice
-    if [ "$choice" = "Y" ] || [ "$choice" = "y" ] || [ -z "$choice" ]; then
-        if [ "$package_name" = "sudo" ]; then
-            echo "To install the 'sudo' package you will need root access"
-            sleep 1
-            echo "Note: To install 'sudo' package, it is necessary to restart your system after installation."
-            sleep 1
-            echo "Do you want to continue with the script? (Y/n)"
-            read -r continue_choice
-            if [ "$continue_choice" = "Y" ] || [ "$continue_choice" = "y" ]; then
-                su -c "apt update && apt install -y sudo && usermod -aG sudo $(whoami)"
-                display_message 0 "Installed successfully" "Failed to install '$package_name'. Exiting..."
-            else
-                echo -e "\e[31mExiting the script.\e[0m"
-                exit 1
-           fi
-        fi
-    fi
-}
-
-# Check if sudo is installed.
-if ! command -v sudo &> /dev/null; then
-    install_package_if_not_installed "sudo"
-    clear_screen
-    echo "Rebooting the system is recommended to apply the group changes."
-    sleep 1
-    echo -e "\e[32mScript completed successfully.\e[0m"
-    press_enter_to_continue
+clear_screen
+echo "To install the 'sudo' package you will need root access"
+sleep 1
+echo "Note: To install 'sudo' package, it is necessary to restart your system after installation."
+sleep 1
+echo "Do you want to continue with the installation? (Y/n)"
+read -r install_choice
+if [ "$install_choice" = "Y" ] || [ "$install_choice" = "y" ] || [ "$install_choice" = "Yes" ] || [ "$install_choice" = "yes" ]; then
+    su -c "apt update && apt install -y sudo && usermod -aG sudo $(whoami)"
+    display_message 0 "Installed successfully" "Failed to install. Exiting..."
+else
+    echo -e "\e[31mExiting the script.\e[0m"
     exit 1
+fi
+clear_screen
+echo -e "\e[32mSudo package installed successfully!\e[0m"
+sleep 1
+echo "You may need to restart your system for changes to take effect."
+sleep 1
+echo "Do you want to reboot the system? (Y/n)"
+read -r reboot_choice
+if [ "$reboot_choice" = "Y" ] || [ "$reboot_choice" = "y" ] || [ "$reboot_choice" = "Yes" ] || [ "$reboot_choice" = "yes" ]; then
+    echo 'Rebooting system now'
+    sleep 2
+    reboot
+else
+    exit 0
 fi
