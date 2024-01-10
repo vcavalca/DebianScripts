@@ -42,7 +42,7 @@ install_package_if_not_installed() {
             sleep 1
             echo "Do you want to continue with the script? (Y/n)"
             read -r continue_choice
-            if [ "$continue_choice" = "Y" ] && [ "$continue_choice" = "y" ] && [ -n "$continue_choice" ]; then
+            if [ "$continue_choice" = "Y" ] || [ "$continue_choice" = "y" ]; then
                 $package_command
                 display_message 0 "Installed successfully" "Failed to install '$package_name'. Exiting..."
             else
