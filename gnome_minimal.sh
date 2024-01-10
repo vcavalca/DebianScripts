@@ -11,6 +11,7 @@ press_enter_to_continue() {
 
 # Function to clear the screen.
 clear_screen() {
+    sleep 3
     clear
 }
 
