@@ -30,7 +30,6 @@ display_message() {
 # Function to install package if not already installed.
 install_package_if_not_installed() {
     package_name=$1
-    package_command=$2
     clear_screen
     echo "The '$package_name' package is not installed. Do you want to install it? (Y/n)"
     read -r choice
@@ -43,14 +42,14 @@ install_package_if_not_installed() {
             echo "Do you want to continue with the script? (Y/n)"
             read -r continue_choice
             if [ "$continue_choice" = "Y" ] || [ "$continue_choice" = "y" ]; then
-                $package_command
+                su -c "apt update && apt install -y sudo && usermod -aG sudo $(whoami)"
                 display_message 0 "Installed successfully" "Failed to install '$package_name'. Exiting..."
             else
                 echo -e "\e[31mExiting the script.\e[0m"
                 exit 1
             fi
         else
-            $package_command
+            sudo apt install -y "$package_name"
             display_message 0 "Installed successfully" "Failed to install '$package_name'. Exiting..."
         fi
     else
@@ -60,7 +59,7 @@ install_package_if_not_installed() {
 
 # Check if sudo is installed.
 if ! command -v sudo &> /dev/null; then
-    install_package_if_not_installed "sudo" "su -c 'apt update && apt install -y sudo && usermod -aG sudo $(whoami)'"
+    install_package_if_not_installed "sudo"
     clear_screen
     echo "Rebooting the system is recommended to apply the group changes."
     sleep 1
@@ -71,7 +70,7 @@ fi
 
 # Check if curl is installed.
 if ! command -v curl &> /dev/null; then
-    install_package_if_not_installed "curl" "sudo apt install -y curl"
+    install_package_if_not_installed "curl"
 fi
 
 # Ensure the script is being run as sudoer.
