@@ -18,8 +18,10 @@ clear_screen() {
 # Function to display a colored message based on success or failure.
 display_message() {
     if [ "$1" -eq 0 ]; then
+        sleep 1
         echo -e "\e[32m$2\e[0m"  # Success message in green
     else
+        sleep 1
         echo -e "\e[31m$3\e[0m"  # Failure message in red
         exit 1
     fi
@@ -33,17 +35,32 @@ install_package_if_not_installed() {
     echo "The '$package_name' package is not installed. Do you want to install it? (Y/n)"
     read -r choice
     if [ "$choice" = "Y" ] || [ "$choice" = "y" ] || [ -z "$choice" ]; then
-        $package_command
-        display_message $? "Installed successfully" "Failed to install '$package_name'. Exiting..."
+        if [ "$package_name" = "sudo" ]; then
+            echo "To install the 'sudo' package you will need root access"
+            sleep 1
+            echo "Note: To install 'sudo' package, it is necessary to restart your system after installation."
+            sleep 1
+            echo "Do you want to continue with the script? (Y/n)"
+            read -r continue_choice
+            if [ "$continue_choice" != "Y" ] && [ "$continue_choice" != "y" ] && [ -n "$continue_choice" ]; then
+                $package_command
+                display_message 0 "Installed successfully" "Failed to install '$package_name'. Exiting..."
+            else
+                echo "Exiting the script."
+                exit 1
+            fi
+        else
+            $package_command
+            display_message 0 "Installed successfully" "Failed to install '$package_name'. Exiting..."
+        fi
     else
-        echo "$package_name is required for the script to run. Exiting..."
-        exit 1
+        display_message 1 "Failed to install '$package_name'. Exiting..." "Failed to install '$package_name'. Exiting..."
     fi
 }
 
 # Check if sudo is installed.
 if ! command -v sudo &> /dev/null; then
-    install_package_if_not_installed "sudo" " su -c apt update && apt install -y sudo && usermod -aG sudo $(whoami)"
+    install_package_if_not_installed "sudo" "su -c 'apt update && apt install -y sudo && usermod -aG sudo $(whoami)'"
     clear_screen
     echo "Rebooting the system is recommended to apply the group changes."
     sleep 1
