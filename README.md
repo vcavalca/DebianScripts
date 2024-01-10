@@ -14,8 +14,4 @@ This repository contains useful scripts for automating tasks on the Debian syste
 
 3. Give execute permission to the desired scripts.
    ```bash
-   chmod +x gnome_minimal.sh
-
-4. Run the scripts as needed.
-   ```bash
-   sudo ./gnome_minimal.sh
+   sudo ./main_script.sh
