@@ -25,27 +25,37 @@ display_message() {
     fi
 }
 
+# Function to install package if not already installed.
+install_package_if_not_installed() {
+    package_name=$1
+    package_command=$2
+    clear_screen
+    echo "The '$package_name' package is not installed. Do you want to install it? (Y/n)"
+    read -r choice
+    if [ "$choice" = "Y" ] || [ "$choice" = "y" ] || [ -z "$choice" ]; then
+        $package_command
+        display_message $? "Installed successfully" "Failed to install '$package_name'. Exiting..."
+    else
+        echo "$package_name is required for the script to run. Exiting..."
+        exit 1
+    fi
+}
+
 # Check if sudo is installed.
 if ! command -v sudo &> /dev/null; then
+    install_package_if_not_installed "sudo" " su -c apt update && apt install -y sudo && usermod -aG sudo $(whoami)"
     clear_screen
-    echo "The 'sudo' package is not installed. Installing..."
-    press_enter_to_continue
-    su -c "apt update && apt install -y sudo && usermod -aG sudo $(whoami)"
-    clear_screen
-    echo "It will be necessary to reboot the system to apply the group changes."
-    press_enter_to_continue
+    echo "Rebooting the system is recommended to apply the group changes."
+    sleep 1
     echo "Please re-run the script after restarting to apply the group changes."
     press_enter_to_continue
+    reboot
     exit 0
 fi
 
 # Check if curl is installed.
 if ! command -v curl &> /dev/null; then
-    clear_screen
-    echo "The 'curl' package is not installed. Installing..."
-    press_enter_to_continue
-    sudo apt install -y curl
-    display_message $? "Successfully installed" "Failed to install 'curl'. Exiting..."
+    install_package_if_not_installed "curl" "sudo apt install -y curl"
 fi
 
 # Ensure the script is being run as sudoer.
@@ -59,32 +69,31 @@ fi
 # Download and add the Brave Browser keyring.
 clear_screen
 echo "Downloading and adding Brave Browser keyring..."
-press_enter_to_continue
+sleep 1
 sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
-display_message $? "Successfully installed" "Failed to download and add Brave Browser keyring. Exiting..."
+display_message $? "Added successfully" "Failed to download and add Brave Browser keyring. Exiting..."
 
 # Add Brave Browser repository.
-clear_screen
 echo "Adding Brave Browser repository..."
-press_enter_to_continue
+sleep 1
 echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
-display_message $? "Successfully installed" "Failed to add Brave Browser repository. Exiting..."
+display_message $? "Added successfully" "Failed to add Brave Browser repository. Exiting..."
 
 # Update package list.
-clear_screen
 echo "Updating the package list..."
-press_enter_to_continue
+sleep 1
 sudo apt update
-display_message $? "Successfully installed" "Failed to update the package list. Exiting..."
+display_message $? "Updated successfully" "Failed to update the package list. Exiting..."
 
 # Install Brave Browser.
-clear_screen
 echo "Installing Brave Browser..."
-press_enter_to_continue
+sleep 1
 sudo apt install -y brave-browser
-display_message $? "Successfully installed" "Failed to install Brave Browser. Exiting..."
+display_message $? "Installed successfully" "Failed to install Brave Browser. Exiting..."
 
 # Display a message indicating successful installation.
 clear_screen
 echo -e "\e[32mBrave Browser installation complete.\e[0m"  # Success message in green
+sleep 1
+echo -e "\e[32mScript completed successfully.\e[0m"
 press_enter_to_continue
