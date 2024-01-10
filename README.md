@@ -18,4 +18,4 @@ This repository contains useful scripts for automating tasks on the Debian syste
 
 4. Run the scripts as needed.
    ```bash
-   ./gnome_minimal.sh
+   sudo ./gnome_minimal.sh
