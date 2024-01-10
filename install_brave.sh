@@ -27,58 +27,13 @@ display_message() {
     fi
 }
 
-# Function to install package if not already installed.
-install_package_if_not_installed() {
-    package_name=$1
-    clear_screen
-    echo "The '$package_name' package is not installed. Do you want to install it? (Y/n)"
-    read -r choice
-    if [ "$choice" = "Y" ] || [ "$choice" = "y" ] || [ -z "$choice" ]; then
-        if [ "$package_name" = "sudo" ]; then
-            echo "To install the 'sudo' package you will need root access"
-            sleep 1
-            echo "Note: To install 'sudo' package, it is necessary to restart your system after installation."
-            sleep 1
-            echo "Do you want to continue with the script? (Y/n)"
-            read -r continue_choice
-            if [ "$continue_choice" = "Y" ] || [ "$continue_choice" = "y" ]; then
-                su -c "apt update && apt install -y sudo && usermod -aG sudo $(whoami)"
-                display_message 0 "Installed successfully" "Failed to install '$package_name'. Exiting..."
-            else
-                echo -e "\e[31mExiting the script.\e[0m"
-                exit 1
-            fi
-        else
-            sudo apt install -y "$package_name"
-            display_message 0 "Installed successfully" "Failed to install '$package_name'. Exiting..."
-        fi
-    else
-        display_message 1 "Failed to install '$package_name'. Exiting..." "Failed to install '$package_name'. Exiting..."
-    fi
-}
-
-# Check if sudo is installed.
-if ! command -v sudo &> /dev/null; then
-    install_package_if_not_installed "sudo"
-    clear_screen
-    echo "Rebooting the system is recommended to apply the group changes."
-    sleep 1
-    echo "Please re-run the script after restarting to apply the group changes."
-    press_enter_to_continue
-    exit 1
-fi
-
 # Check if curl is installed.
 if ! command -v curl &> /dev/null; then
-    install_package_if_not_installed "curl"
-fi
-
-# Ensure the script is being run as sudoer.
-if [ "$(id -u)" != "0" ]; then
     clear_screen
-    echo "This script must be run as a superuser. Use 'sudo ./install_brave.sh'" 1>&2
-    press_enter_to_continue
-    exit 1
+    echo "Installing the curl package..."
+    sleep 1
+    sudo apt install -y curl
+    display_message $? "Installed successfully" "Failed to install curl. Exiting..."
 fi
 
 # Download and add the Brave Browser keyring.
