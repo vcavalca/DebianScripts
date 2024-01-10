@@ -46,7 +46,7 @@ install_package_if_not_installed() {
                 $package_command
                 display_message 0 "Installed successfully" "Failed to install '$package_name'. Exiting..."
             else
-                echo "Exiting the script."
+                echo -e "\e[31mExiting the script.\e[0m"
                 exit 1
             fi
         else
